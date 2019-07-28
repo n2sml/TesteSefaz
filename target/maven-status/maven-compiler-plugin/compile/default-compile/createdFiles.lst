@@ -1,0 +1,5 @@
+controller\CreateUser.class
+controller\UpdateUser.class
+controller\DeleteUser.class
+controller\ReadUser.class
+com\sefazteste\mavenwebapp\TesteBancoSimples.class

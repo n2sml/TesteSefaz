@@ -13,6 +13,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+
 /**
  *
  * @author nicolas
@@ -33,10 +39,58 @@ public class CreateUser extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-                        
+
+            getCustomers();
+
             RequestDispatcher rd = request.getRequestDispatcher("create.jsp");
-            rd.forward(request,response);
-            
+            rd.forward(request, response);
+
+        }catch(ServletException e){
+            System.out.println(e);
+        }
+    }
+
+    public static void getCustomers() {
+        try {
+            Class.forName("org.hsqldb.jdbc.JDBCDriver");
+        } catch (Exception e) {
+            System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
+            e.printStackTrace();
+            return;
+        }
+
+        Connection conn = null;
+        String db = "jdbc:hsqldb:hsql://localhost/sampledb;ifexists=true";
+        String user = "SA";
+        String password = "";
+
+        try {
+            // Create database connection
+            conn = DriverManager.getConnection(db, user, password);
+
+            // Create and execute statement
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("select FIRSTNAME, LASTNAME from CUSTOMER");
+
+            // Loop through the data and print all artist names
+            while (rs.next()) {
+                System.out.println("Customer Name: " + rs.getString("FIRSTNAME") + " " + rs.getString("LASTNAME"));
+            }
+
+            // Clean up
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            try {
+                // Close connection
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
         }
     }
 
