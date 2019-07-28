@@ -16,8 +16,13 @@
         <servlet-name>UpdateUser</servlet-name>
         <servlet-class>controller.UpdateUser</servlet-class>
     </servlet>
-    
-    
+    <welcome-file-list>
+        <welcome-file>login.jsp</welcome-file>
+    </welcome-file-list>
+    <servlet>
+        <servlet-name>LoginUser</servlet-name>
+        <servlet-class>controller.LoginUser</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>CreateUser</servlet-name>
         <url-pattern>/CreateUser</url-pattern>
@@ -34,8 +39,10 @@
         <servlet-name>UpdateUser</servlet-name>
         <url-pattern>/UpdateUser</url-pattern>
     </servlet-mapping>
-    
-    
+    <servlet-mapping>
+        <servlet-name>LoginUser</servlet-name>
+        <url-pattern>/LoginUser</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>
             30

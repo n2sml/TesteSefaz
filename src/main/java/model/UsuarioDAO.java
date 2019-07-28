@@ -26,9 +26,11 @@ public class UsuarioDAO {
     private static final String QUERY_DELETE_USER_BY_ID = "DELETE FROM usuario WHERE id=?1;";
     private static final String QUERY_DELETE_TELEFONES_BY_ID = "DELETE FROM telefone WHERE usuarioId=?1;";
     private static final String QUERY_GET_USER_BY_ID = "SELECT nome, email, senha FROM usuario WHERE id=?1;";
-    
+
     private static final String QUERY_EDIT_USUARIO = "UPDATE usuario SET nome='?1', email='?2', senha='?3' WHERE id=?4;";
     private static final String QUERY_EDIT_TELEFONE = "UPDATE telefone SET ddd=?1, numero='?2', tipo='?3' WHERE usuarioId=?4;";
+
+    private static final String QUERY_LOGIN = "SELECT id FROM usuario WHERE nome='?1' AND senha='?2';";
 
     public static ArrayList<Usuario> getAllUsers() {
         ArrayList<Usuario> temp = new ArrayList();
@@ -257,16 +259,16 @@ public class UsuarioDAO {
         }
         try {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
-            Statement stmt = conn.createStatement();            
-            String tempQuery = QUERY_GET_USER_BY_ID.replace("?1", Integer.toString(id));  
+            Statement stmt = conn.createStatement();
+            String tempQuery = QUERY_GET_USER_BY_ID.replace("?1", Integer.toString(id));
             System.out.println("    QUERY: " + tempQuery);
             ResultSet rs = stmt.executeQuery(tempQuery);
 
-            while (rs.next()) {                
+            while (rs.next()) {
                 tempUser.setNome(rs.getString("nome"));
                 tempUser.setEmail(rs.getString("email"));
                 tempUser.setSenha(rs.getString("senha"));
-                tempUser.setTelefones(getTelefonesById( id ));                
+                tempUser.setTelefones(getTelefonesById(id));
             }
             rs.close();
             stmt.close();
@@ -284,7 +286,7 @@ public class UsuarioDAO {
         System.out.println("CHEGOU AO RETURN");
         return tempUser;
     }
-    
+
     public static void editUser(Usuario usuario) {
         try {
             Class.forName(HSQL_DRIVER_CLASS);
@@ -297,7 +299,7 @@ public class UsuarioDAO {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
             CallableStatement callstmt = null;
 
-            String tempQuery =  QUERY_EDIT_USUARIO.replace("?1", usuario.getNome());
+            String tempQuery = QUERY_EDIT_USUARIO.replace("?1", usuario.getNome());
             tempQuery = tempQuery.replace("?2", usuario.getEmail());
             tempQuery = tempQuery.replace("?3", usuario.getSenha());
             tempQuery = tempQuery.replace("?4", Integer.toString(usuario.getId()));
@@ -305,9 +307,9 @@ public class UsuarioDAO {
             callstmt.execute();
 
             int id = getIdFromUsuario(usuario);
-            
+
             editTelefones(usuario.getTelefones(), id);
-            
+
             callstmt.close();
             conn.close();
         } catch (SQLException e) {
@@ -322,7 +324,7 @@ public class UsuarioDAO {
             }
         }
     }
-    
+
     public static void editTelefones(ArrayList<Telefone> telefoneArray, int id) {
         try {
             Class.forName(HSQL_DRIVER_CLASS);
@@ -354,5 +356,44 @@ public class UsuarioDAO {
                 System.err.println(e.getMessage());
             }
         }
+    }
+
+    public static boolean login(String login, String senha) {
+        boolean isEmpty = false;
+        try {
+            Class.forName(HSQL_DRIVER_CLASS);
+        } catch (Exception e) {
+            System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
+            e.printStackTrace();
+            return false;
+        }
+        
+        try {
+            conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
+            Statement stmt = conn.createStatement();
+
+            String tempQuery = QUERY_LOGIN.replace("?1", login);
+            tempQuery = tempQuery.replace("?2", senha);
+
+            System.out.println("    QUERY: " + tempQuery);
+            ResultSet rs = stmt.executeQuery(tempQuery);
+
+            while (rs.next()) {
+                isEmpty = true;
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+        return isEmpty;
     }
 }
