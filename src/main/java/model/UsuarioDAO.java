@@ -18,15 +18,19 @@ public class UsuarioDAO {
     private static Connection conn = null;
 
     //Queries:
-    private static final String QUERY_READ_USERS = "SELECT nome, email, senha, id FROM usuario;";
+    private static final String QUERY_GET_USERS = "SELECT nome, email, senha, id FROM usuario;";
     private static final String QUERY_GET_TELEFONES_BY_ID = "SELECT ddd, numero, tipo FROM telefone WHERE usuarioid=";
     private static final String QUERY_SET_NEW_USUARIO = "INSERT INTO usuario (nome, email, senha)VALUES('?1','?2','?3');";
     private static final String QUERY_GET_ID_BY_USER = "SELECT id FROM usuario WHERE nome = '?1' AND email = '?2' AND senha = '?3'";
     private static final String QUERY_SET_NEW_TELEFONE = "INSERT INTO telefone (ddd, numero, tipo, usuarioId) VALUES (?1,'?2','?3', ?4);";
     private static final String QUERY_DELETE_USER_BY_ID = "DELETE FROM usuario WHERE id=?1;";
     private static final String QUERY_DELETE_TELEFONES_BY_ID = "DELETE FROM telefone WHERE usuarioId=?1;";
+    private static final String QUERY_GET_USER_BY_ID = "SELECT nome, email, senha FROM usuario WHERE id=?1;";
+    
+    private static final String QUERY_EDIT_USUARIO = "UPDATE usuario SET nome='?1', email='?2', senha='?3' WHERE id=?4;";
+    private static final String QUERY_EDIT_TELEFONE = "UPDATE telefone SET ddd=?1, numero='?2', tipo='?3' WHERE usuarioId=?4;";
 
-    public static ArrayList<Usuario> getReadUsers() {
+    public static ArrayList<Usuario> getAllUsers() {
         ArrayList<Usuario> temp = new ArrayList();
 
         try {
@@ -39,7 +43,7 @@ public class UsuarioDAO {
         try {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
             Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(QUERY_READ_USERS);
+            ResultSet rs = stmt.executeQuery(QUERY_GET_USERS);
 
             while (rs.next()) {
                 Usuario tempUser = new Usuario();
@@ -209,8 +213,6 @@ public class UsuarioDAO {
     }
 
     public static void deleteUserById(int id) {
-        System.out.println("id = " + id);
-        //QUERY_DELETE_USER_BY_ID
         try {
             Class.forName(HSQL_DRIVER_CLASS);
         } catch (Exception e) {
@@ -229,7 +231,117 @@ public class UsuarioDAO {
             callstmt.execute();
 
             callstmt.close();
-            System.out.println("DELETADO E FECHADO");
+            conn.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+    }
+
+    public static Usuario getUserById(int id) {
+        Usuario tempUser = new Usuario();
+        System.out.println("Chegou no método");
+        try {
+            Class.forName(HSQL_DRIVER_CLASS);
+        } catch (Exception e) {
+            System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
+            e.printStackTrace();
+            return null;
+        }
+        try {
+            conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
+            Statement stmt = conn.createStatement();            
+            String tempQuery = QUERY_GET_USER_BY_ID.replace("?1", Integer.toString(id));  
+            System.out.println("    QUERY: " + tempQuery);
+            ResultSet rs = stmt.executeQuery(tempQuery);
+
+            while (rs.next()) {                
+                tempUser.setNome(rs.getString("nome"));
+                tempUser.setEmail(rs.getString("email"));
+                tempUser.setSenha(rs.getString("senha"));
+                tempUser.setTelefones(getTelefonesById( id ));                
+            }
+            rs.close();
+            stmt.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+        System.out.println("CHEGOU AO RETURN");
+        return tempUser;
+    }
+    
+    public static void editUser(Usuario usuario) {
+        try {
+            Class.forName(HSQL_DRIVER_CLASS);
+        } catch (Exception e) {
+            System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
+            e.printStackTrace();
+            return;
+        }
+        try {
+            conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
+            CallableStatement callstmt = null;
+
+            String tempQuery =  QUERY_EDIT_USUARIO.replace("?1", usuario.getNome());
+            tempQuery = tempQuery.replace("?2", usuario.getEmail());
+            tempQuery = tempQuery.replace("?3", usuario.getSenha());
+            tempQuery = tempQuery.replace("?4", Integer.toString(usuario.getId()));
+            callstmt = conn.prepareCall(tempQuery);
+            callstmt.execute();
+
+            int id = getIdFromUsuario(usuario);
+            
+            editTelefones(usuario.getTelefones(), id);
+            
+            callstmt.close();
+            conn.close();
+        } catch (SQLException e) {
+            System.err.println(e.getMessage());
+        } finally {
+            try {
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                System.err.println(e.getMessage());
+            }
+        }
+    }
+    
+    public static void editTelefones(ArrayList<Telefone> telefoneArray, int id) {
+        try {
+            Class.forName(HSQL_DRIVER_CLASS);
+        } catch (Exception e) {
+            System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
+            e.printStackTrace();
+        }
+        try {
+            conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
+            CallableStatement callstmt = null;
+            for (int index = 0; index < telefoneArray.size(); index++) {
+                String tempQuery = QUERY_EDIT_TELEFONE.replace("?1", Integer.toString(telefoneArray.get(index).getDdd()));
+                tempQuery = tempQuery.replace("?2", telefoneArray.get(index).getNumero());
+                tempQuery = tempQuery.replace("?3", telefoneArray.get(index).getTipo());
+                tempQuery = tempQuery.replace("?4", Integer.toString(id));
+                callstmt = conn.prepareCall(tempQuery);
+                callstmt.execute();
+            }
+            callstmt.close();
             conn.close();
         } catch (SQLException e) {
             System.err.println(e.getMessage());

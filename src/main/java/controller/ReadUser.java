@@ -17,7 +17,7 @@ public class ReadUser extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        ArrayList<Usuario> temp = UsuarioDAO.getReadUsers();
+        ArrayList<Usuario> temp = UsuarioDAO.getAllUsers();
 
         request.setAttribute("array", temp);
 

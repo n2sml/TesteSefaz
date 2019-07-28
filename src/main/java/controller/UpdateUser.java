@@ -1,81 +1,63 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import model.Telefone;
+import model.Usuario;
+import model.UsuarioDAO;
 
-/**
- *
- * @author nicolas
- */
 public class UpdateUser extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            
-            RequestDispatcher rd = request.getRequestDispatcher("/update.jsp");
-            rd.forward(request,response);
-        }
-    }
-
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        ArrayList<Usuario> temp = UsuarioDAO.getAllUsers();
+        request.setAttribute("array", temp);
+        RequestDispatcher rd = request.getRequestDispatcher("/update.jsp");
+        rd.forward(request, response);
     }
-
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        System.out.println("chegou o post...");
+        
+        Usuario tempUsuario = new Usuario();
+
+        tempUsuario.setNome((String) request.getParameter("nome"));
+        tempUsuario.setSenha((String) request.getParameter("senha"));
+        tempUsuario.setEmail((String) request.getParameter("email"));
+        tempUsuario.setId(Integer.parseInt(request.getParameter("id")));
+
+        int telefonesSize = request.getParameterValues("numero").length;
+
+        ArrayList<Telefone> telefoneArrayTemp = new ArrayList();
+
+        for (int index = 0; index < telefonesSize; index++) {
+            Telefone tempTelefone = new Telefone();
+
+            tempTelefone.setDdd(Integer.parseInt((String) request.getParameter("ddd")));
+            tempTelefone.setNumero((String) request.getParameter("numero"));
+            tempTelefone.setTipo((String) request.getParameter("tipo"));
+            
+            telefoneArrayTemp.add(tempTelefone);
+        }
+        
+        tempUsuario.setTelefones(telefoneArrayTemp);
+        
+        UsuarioDAO.editUser(tempUsuario);
+        
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
+    }
 
 }

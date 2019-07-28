@@ -15,8 +15,7 @@ public class DeleteUser extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        System.out.println("DOGET RODOU");
-        ArrayList<Usuario> temp = UsuarioDAO.getReadUsers();
+        ArrayList<Usuario> temp = UsuarioDAO.getAllUsers();
         request.setAttribute("array", temp);
         RequestDispatcher rd = request.getRequestDispatcher("/delete.jsp");
         rd.forward(request, response);
