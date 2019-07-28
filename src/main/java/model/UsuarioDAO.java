@@ -26,37 +26,33 @@ public class UsuarioDAO {
     private static final String QUERY_DELETE_USER_BY_ID = "DELETE FROM usuario WHERE id=?1;";
     private static final String QUERY_DELETE_TELEFONES_BY_ID = "DELETE FROM telefone WHERE usuarioId=?1;";
     private static final String QUERY_GET_USER_BY_ID = "SELECT nome, email, senha FROM usuario WHERE id=?1;";
-
     private static final String QUERY_EDIT_USUARIO = "UPDATE usuario SET nome='?1', email='?2', senha='?3' WHERE id=?4;";
     private static final String QUERY_EDIT_TELEFONE = "UPDATE telefone SET ddd=?1, numero='?2', tipo='?3' WHERE usuarioId=?4;";
-
     private static final String QUERY_LOGIN = "SELECT id FROM usuario WHERE nome='?1' AND senha='?2';";
 
     public static ArrayList<Usuario> getAllUsers() {
         ArrayList<Usuario> temp = new ArrayList();
-
         try {
             Class.forName(HSQL_DRIVER_CLASS);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
             return null;
         }
         try {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(QUERY_GET_USERS);
-
-            while (rs.next()) {
-                Usuario tempUser = new Usuario();
-                tempUser.setNome(rs.getString("nome"));
-                tempUser.setEmail(rs.getString("email"));
-                tempUser.setSenha(rs.getString("senha"));
-                tempUser.setId(Integer.parseInt(rs.getString("id")));
-                tempUser.setTelefones(getTelefonesById(Integer.parseInt(rs.getString("id"))));
-                temp.add(tempUser);
+            Statement stmt;
+            stmt = conn.createStatement();
+            try (ResultSet rs = stmt.executeQuery(QUERY_GET_USERS)) {
+                while (rs.next()) {
+                    Usuario tempUser = new Usuario();
+                    tempUser.setNome(rs.getString("nome"));
+                    tempUser.setEmail(rs.getString("email"));
+                    tempUser.setSenha(rs.getString("senha"));
+                    tempUser.setId(Integer.parseInt(rs.getString("id")));
+                    tempUser.setTelefones(getTelefonesById(Integer.parseInt(rs.getString("id"))));
+                    temp.add(tempUser);
+                }
             }
-            rs.close();
             stmt.close();
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -76,26 +72,21 @@ public class UsuarioDAO {
         ArrayList<Telefone> temp = new ArrayList();
         try {
             Class.forName(HSQL_DRIVER_CLASS);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
             return null;
         }
         try {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(QUERY_GET_TELEFONES_BY_ID + id);
-
-            while (rs.next()) {
-                Telefone tempNumber = new Telefone();
-                tempNumber.setDdd(Integer.parseInt(rs.getString("ddd")));
-                tempNumber.setNumero(rs.getString("numero"));
-                tempNumber.setTipo(rs.getString("tipo"));
-                temp.add(tempNumber);
+            try (Statement stmt = conn.createStatement(); ResultSet rs = stmt.executeQuery(QUERY_GET_TELEFONES_BY_ID + id)) {
+                while (rs.next()) {
+                    Telefone tempNumber = new Telefone();
+                    tempNumber.setDdd(Integer.parseInt(rs.getString("ddd")));
+                    tempNumber.setNumero(rs.getString("numero"));
+                    tempNumber.setTipo(rs.getString("tipo"));
+                    temp.add(tempNumber);
+                }
             }
-
-            rs.close();
-            stmt.close();
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         } finally {
@@ -113,21 +104,18 @@ public class UsuarioDAO {
     public static void setNewUser(Usuario usuario) {
         try {
             Class.forName(HSQL_DRIVER_CLASS);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
             return;
         }
         try {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
-            CallableStatement callstmt = null;
-
+            CallableStatement callstmt;
             String tempQuery = QUERY_SET_NEW_USUARIO.replace("?1", usuario.getNome());
             tempQuery = tempQuery.replace("?2", usuario.getEmail());
             tempQuery = tempQuery.replace("?3", usuario.getSenha());
             callstmt = conn.prepareCall(tempQuery);
             callstmt.execute();
-
             int id = getIdFromUsuario(usuario);
             setTelefones(usuario.getTelefones(), id);
             callstmt.close();
@@ -149,9 +137,8 @@ public class UsuarioDAO {
         int id = -1;
         try {
             Class.forName(HSQL_DRIVER_CLASS);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
             return id;
         }
         try {
@@ -160,12 +147,11 @@ public class UsuarioDAO {
             String tempQuery = QUERY_GET_ID_BY_USER.replace("?1", usuario.getNome());
             tempQuery = tempQuery.replace("?2", usuario.getEmail());
             tempQuery = tempQuery.replace("?3", usuario.getSenha());
-            ResultSet rs = stmt.executeQuery(tempQuery);
-            while (rs.next()) {
-                id = Integer.parseInt(rs.getString("id"));
+            try (ResultSet rs = stmt.executeQuery(tempQuery)) {
+                while (rs.next()) {
+                    id = Integer.parseInt(rs.getString("id"));
+                }
             }
-
-            rs.close();
             conn.close();
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -181,16 +167,17 @@ public class UsuarioDAO {
         return id;
     }
 
+    @SuppressWarnings("null")
     public static void setTelefones(ArrayList<Telefone> telefoneArray, int id) {
         try {
             Class.forName(HSQL_DRIVER_CLASS);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
         }
         try {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
-            CallableStatement callstmt = null;
+            CallableStatement callstmt;
+            callstmt = null;
             for (int index = 0; index < telefoneArray.size(); index++) {
                 String tempQuery = QUERY_SET_NEW_TELEFONE.replace("?1", Integer.toString(telefoneArray.get(index).getDdd()));
                 tempQuery = tempQuery.replace("?2", telefoneArray.get(index).getNumero());
@@ -214,24 +201,23 @@ public class UsuarioDAO {
         }
     }
 
+    @SuppressWarnings({"null", "UnusedAssignment"})
     public static void deleteUserById(int id) {
         try {
             Class.forName(HSQL_DRIVER_CLASS);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
         }
         try {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
-            CallableStatement callstmt = null;
+            CallableStatement callstmt;
+            callstmt = null;
             String tempQuery = QUERY_DELETE_USER_BY_ID.replace("?1", Integer.toString(id));
             callstmt = conn.prepareCall(tempQuery);
             callstmt.execute();
-
             tempQuery = QUERY_DELETE_TELEFONES_BY_ID.replace("?1", Integer.toString(id));
             callstmt = conn.prepareCall(tempQuery);
             callstmt.execute();
-
             callstmt.close();
             conn.close();
         } catch (SQLException e) {
@@ -247,14 +233,14 @@ public class UsuarioDAO {
         }
     }
 
+    @SuppressWarnings("ConvertToTryWithResources")
     public static Usuario getUserById(int id) {
         Usuario tempUser = new Usuario();
         System.out.println("Chegou no método");
         try {
             Class.forName(HSQL_DRIVER_CLASS);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
             return null;
         }
         try {
@@ -263,7 +249,6 @@ public class UsuarioDAO {
             String tempQuery = QUERY_GET_USER_BY_ID.replace("?1", Integer.toString(id));
             System.out.println("    QUERY: " + tempQuery);
             ResultSet rs = stmt.executeQuery(tempQuery);
-
             while (rs.next()) {
                 tempUser.setNome(rs.getString("nome"));
                 tempUser.setEmail(rs.getString("email"));
@@ -290,27 +275,21 @@ public class UsuarioDAO {
     public static void editUser(Usuario usuario) {
         try {
             Class.forName(HSQL_DRIVER_CLASS);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
             return;
         }
         try {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
-            CallableStatement callstmt = null;
-
             String tempQuery = QUERY_EDIT_USUARIO.replace("?1", usuario.getNome());
             tempQuery = tempQuery.replace("?2", usuario.getEmail());
             tempQuery = tempQuery.replace("?3", usuario.getSenha());
             tempQuery = tempQuery.replace("?4", Integer.toString(usuario.getId()));
-            callstmt = conn.prepareCall(tempQuery);
-            callstmt.execute();
-
-            int id = getIdFromUsuario(usuario);
-
-            editTelefones(usuario.getTelefones(), id);
-
-            callstmt.close();
+            try (CallableStatement callstmt = conn.prepareCall(tempQuery)) {
+                callstmt.execute();
+                int id = getIdFromUsuario(usuario);
+                editTelefones(usuario.getTelefones(), id);
+            }
             conn.close();
         } catch (SQLException e) {
             System.err.println(e.getMessage());
@@ -325,12 +304,12 @@ public class UsuarioDAO {
         }
     }
 
+    @SuppressWarnings("null")
     public static void editTelefones(ArrayList<Telefone> telefoneArray, int id) {
         try {
             Class.forName(HSQL_DRIVER_CLASS);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
         }
         try {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
@@ -362,27 +341,22 @@ public class UsuarioDAO {
         boolean isEmpty = false;
         try {
             Class.forName(HSQL_DRIVER_CLASS);
-        } catch (Exception e) {
+        } catch (ClassNotFoundException e) {
             System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
             return false;
         }
-        
         try {
             conn = DriverManager.getConnection(DATABASE, LOGIN_USER, LOGIN_PASSWORD);
-            Statement stmt = conn.createStatement();
-
-            String tempQuery = QUERY_LOGIN.replace("?1", login);
-            tempQuery = tempQuery.replace("?2", senha);
-
-            System.out.println("    QUERY: " + tempQuery);
-            ResultSet rs = stmt.executeQuery(tempQuery);
-
-            while (rs.next()) {
-                isEmpty = true;
+            try (Statement stmt = conn.createStatement()) {
+                String tempQuery = QUERY_LOGIN.replace("?1", login);
+                tempQuery = tempQuery.replace("?2", senha);
+                System.out.println("    QUERY: " + tempQuery);
+                ResultSet rs = stmt.executeQuery(tempQuery);
+                while (rs.next()) {
+                    isEmpty = true;
+                }
+                rs.close();
             }
-            rs.close();
-            stmt.close();
         } catch (SQLException e) {
             System.err.println(e.getMessage());
         } finally {
