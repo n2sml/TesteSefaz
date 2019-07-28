@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package controller;
 
 import java.io.IOException;
@@ -19,74 +14,53 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import model.Telefone;
+import model.Usuario;
+import model.UsuarioDAO;
 
-/**
- *
- * @author nicolas
- */
 public class CreateUser extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            
-            RequestDispatcher rd = request.getRequestDispatcher("create.jsp");
-            
-            
-            rd.forward(request, response);
-
-        }catch(ServletException e){
-            System.out.println(e);
-        }
-    }
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        System.out.println("Servidor recebeu Get() no servlet de Criação de Usuário");
+
+        RequestDispatcher rd = request.getRequestDispatcher("create.jsp");
+        rd.forward(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        System.out.println("Servidor recebeu Post() no servlet de Criação de Usuário");
+
+        Usuario tempUsuario = new Usuario();
+
+        tempUsuario.setNome((String) request.getParameter("nome"));
+        tempUsuario.setSenha((String) request.getParameter("senha"));
+        tempUsuario.setEmail((String) request.getParameter("email"));
+
+        int telefonesSize = request.getParameterValues("numero").length;
+
+        ArrayList<Telefone> telefoneArrayTemp = new ArrayList();
+
+        for (int index = 0; index < telefonesSize; index++) {
+            Telefone tempTelefone = new Telefone();
+
+            tempTelefone.setDdd(Integer.parseInt((String) request.getParameter("ddd")));
+            tempTelefone.setNumero((String) request.getParameter("numero"));
+            tempTelefone.setTipo((String) request.getParameter("tipo"));
+            
+            telefoneArrayTemp.add(tempTelefone);
+        }
+        
+        tempUsuario.setTelefones(telefoneArrayTemp);
+        
+        UsuarioDAO.setNewUser(tempUsuario);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Short description";
-    }// </editor-fold>
-
+    }
 }

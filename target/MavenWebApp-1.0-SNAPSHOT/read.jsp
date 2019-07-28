@@ -1,12 +1,7 @@
-<%-- 
-    Document   : read
-    Created on : 27/07/2019, 20:23:57
-    Author     : nicolas
---%>
-
 <%@page import="model.Usuario"%>
 <%@page import="java.util.ArrayList"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@ taglib prefix="TAG" tagdir="/WEB-INF/tags" %> 
 <!DOCTYPE html>
 <html>
     <head>
