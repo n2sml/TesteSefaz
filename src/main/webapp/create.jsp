@@ -4,6 +4,7 @@
     Author     : nicolas
 --%>
 
+<%@page import="java.util.ArrayList"%>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
 <html>
@@ -13,5 +14,13 @@
     </head>
     <body>
         <h1>Criar Usuário</h1>
+        <% 
+
+        ArrayList<String> words = (ArrayList<String>)request.getAttribute("words");
+       
+        %>
+        
+        <%= words.get(0) %>
+        
     </body>
 </html>

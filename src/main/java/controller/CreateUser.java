@@ -18,6 +18,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 
 /**
  *
@@ -40,9 +41,18 @@ public class CreateUser extends HttpServlet {
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
 
-            getCustomers();
-
+            ArrayList<String> words = new ArrayList();
+            
+            getCustomers(words);
+            
+            System.out.println("TAMANHO: " + words.size());
+            
+            request.setAttribute("words", words);
+            
             RequestDispatcher rd = request.getRequestDispatcher("create.jsp");
+            
+            
+            
             rd.forward(request, response);
 
         }catch(ServletException e){
@@ -50,7 +60,7 @@ public class CreateUser extends HttpServlet {
         }
     }
 
-    public static void getCustomers() {
+    public static void getCustomers(ArrayList<String> words) {
         try {
             Class.forName("org.hsqldb.jdbc.JDBCDriver");
         } catch (Exception e) {
@@ -64,6 +74,8 @@ public class CreateUser extends HttpServlet {
         String user = "SA";
         String password = "";
 
+        
+        
         try {
             // Create database connection
             conn = DriverManager.getConnection(db, user, password);
@@ -73,8 +85,11 @@ public class CreateUser extends HttpServlet {
             ResultSet rs = stmt.executeQuery("select FIRSTNAME, LASTNAME from CUSTOMER");
 
             // Loop through the data and print all artist names
+            
             while (rs.next()) {
                 System.out.println("Customer Name: " + rs.getString("FIRSTNAME") + " " + rs.getString("LASTNAME"));
+                words.add(rs.getString("FIRSTNAME"));
+                words.add(rs.getString("LASTNAME"));
             }
 
             // Clean up
