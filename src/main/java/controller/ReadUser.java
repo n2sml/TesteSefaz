@@ -7,11 +7,15 @@ package controller;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.ArrayList;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import model.UsuarioDAO;
+import model.Usuario;
 
 /**
  *
@@ -32,7 +36,11 @@ public class ReadUser extends HttpServlet {
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
+            
+            ArrayList<Usuario> temp = UsuarioDAO.getReadUsers();
+            
+            request.setAttribute("array", temp);
+            
             RequestDispatcher rd = request.getRequestDispatcher("/read.jsp");
             rd.forward(request,response);
         }

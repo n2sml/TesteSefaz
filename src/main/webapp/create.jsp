@@ -14,13 +14,6 @@
     </head>
     <body>
         <h1>Criar Usuário</h1>
-        <% 
-
-        ArrayList<String> words = (ArrayList<String>)request.getAttribute("words");
-       
-        %>
-        
-        <%= words.get(0) %>
-        
+     
     </body>
 </html>

@@ -1,5 +1,8 @@
+controller\DeleteUser.class
+com\sefazteste\mavenwebapp\TesteBancoSimples.class
 controller\CreateUser.class
 controller\UpdateUser.class
-controller\DeleteUser.class
+model\UsuarioDAO.class
 controller\ReadUser.class
-com\sefazteste\mavenwebapp\TesteBancoSimples.class
+model\Usuario.class
+model\Telefone.class

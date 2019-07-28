@@ -40,17 +40,8 @@ public class CreateUser extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try (PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
-
-            ArrayList<String> words = new ArrayList();
-            
-            getCustomers(words);
-            
-            System.out.println("TAMANHO: " + words.size());
-            
-            request.setAttribute("words", words);
             
             RequestDispatcher rd = request.getRequestDispatcher("create.jsp");
-            
             
             
             rd.forward(request, response);
@@ -59,56 +50,6 @@ public class CreateUser extends HttpServlet {
             System.out.println(e);
         }
     }
-
-    public static void getCustomers(ArrayList<String> words) {
-        try {
-            Class.forName("org.hsqldb.jdbc.JDBCDriver");
-        } catch (Exception e) {
-            System.err.println("ERROR: failed to load HSQLDB JDBC driver.");
-            e.printStackTrace();
-            return;
-        }
-
-        Connection conn = null;
-        String db = "jdbc:hsqldb:hsql://localhost/sampledb;ifexists=true";
-        String user = "SA";
-        String password = "";
-
-        
-        
-        try {
-            // Create database connection
-            conn = DriverManager.getConnection(db, user, password);
-
-            // Create and execute statement
-            Statement stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery("select FIRSTNAME, LASTNAME from CUSTOMER");
-
-            // Loop through the data and print all artist names
-            
-            while (rs.next()) {
-                System.out.println("Customer Name: " + rs.getString("FIRSTNAME") + " " + rs.getString("LASTNAME"));
-                words.add(rs.getString("FIRSTNAME"));
-                words.add(rs.getString("LASTNAME"));
-            }
-
-            // Clean up
-            rs.close();
-            stmt.close();
-        } catch (SQLException e) {
-            System.err.println(e.getMessage());
-        } finally {
-            try {
-                // Close connection
-                if (conn != null) {
-                    conn.close();
-                }
-            } catch (SQLException e) {
-                System.err.println(e.getMessage());
-            }
-        }
-    }
-
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
