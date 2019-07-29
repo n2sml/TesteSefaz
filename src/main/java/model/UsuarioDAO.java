@@ -114,6 +114,7 @@ public class UsuarioDAO {
             String tempQuery = QUERY_SET_NEW_USUARIO.replace("?1", usuario.getNome());
             tempQuery = tempQuery.replace("?2", usuario.getEmail());
             tempQuery = tempQuery.replace("?3", usuario.getSenha());
+            System.out.println("        QUERY -> " + tempQuery);
             callstmt = conn.prepareCall(tempQuery);
             callstmt.execute();
             int id = getIdFromUsuario(usuario);

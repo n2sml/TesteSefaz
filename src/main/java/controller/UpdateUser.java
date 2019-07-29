@@ -53,6 +53,9 @@ public class UpdateUser extends HttpServlet {
         
         UsuarioDAO.editUser(tempUsuario);
         
+        RequestDispatcher rd = request.getRequestDispatcher("menu.jsp");
+        rd.forward(request, response);
+        
     }
 
     @Override

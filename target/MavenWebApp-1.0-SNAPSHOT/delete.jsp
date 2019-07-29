@@ -8,36 +8,54 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>Apagar Usuário</title>
         <TAG:BootstrapCSS />
+        <TAG:CSS />
     </head>
     <body>
-        <h1>Apagar Usuário</h1>
-        <% ArrayList<Usuario> temp = (ArrayList<Usuario>) request.getAttribute("array");  %>
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <h1>Apagar Usuário</h1>
+                    <% ArrayList<Usuario> temp = (ArrayList<Usuario>) request.getAttribute("array");  %>
 
-        <table style="width:100%">    
-            <% for (int index = 0; index < temp.size(); index++) {%>
-            <tr id=" <%=temp.get(index).getId()%> ">
-                <td>
-                    <%= temp.get(index).getNome()%>
-                </td>
-                <td>
-                    <%= temp.get(index).getEmail()%>
-                </td>
-                <td>
-                    <% for (int telefoneIndex = 0; telefoneIndex < temp.get(index).getTelefones().size(); telefoneIndex++) {%>
-                    (<%= temp.get(index).getTelefones().get(telefoneIndex).getDdd()%>)                
-                    <%= temp.get(index).getTelefones().get(telefoneIndex).getNumero()%> - 
-                    "<%= temp.get(index).getTelefones().get(telefoneIndex).getTipo()%>"                    
-                    <% }%>
-                </td>
-                <td>
-                    <button class="delete-button" id="<%= temp.get(index).getId()%>">Apagar</button>
-                </td>
-            </tr>            
-            <% }%>
-        </table>
+                    <table class="table table-hover">    
+                        <thead>
+                            <tr>
+                                <th scope="col">Nome</th>
+                                <th scope="col">E-mail</th>
+                                <th scope="col">Contatos (ddd - número - tipo)</th>
+                                <th scope="col"></th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% for (int index = 0; index < temp.size(); index++) {%>
+                            <tr id=" <%=temp.get(index).getId()%> ">
+                                <td>
+                                    <%= temp.get(index).getNome()%>
+                                </td>
+                                <td>
+                                    <%= temp.get(index).getEmail()%>
+                                </td>
+                                <td>
+                                    <% for (int telefoneIndex = 0; telefoneIndex < temp.get(index).getTelefones().size(); telefoneIndex++) {%>
+                                    (<%= temp.get(index).getTelefones().get(telefoneIndex).getDdd()%>)                
+                                    <%= temp.get(index).getTelefones().get(telefoneIndex).getNumero()%> - 
+                                    "<%= temp.get(index).getTelefones().get(telefoneIndex).getTipo()%>"                    
+                                    <% }%>
+                                </td>
+                                <td>
+                                    <button class="delete-button btn btn-danger btn-sm" id="<%= temp.get(index).getId()%>">Apagar</button>
+                                </td>
+                            </tr>   
+                        </tbody>
+                        <% }%>
+                    </table>
+                </div>                 
+            </div>
+        </div>
+        <TAG:BotaoVoltar />
         <TAG:jQuery />
     </body>
-    <script>        
+    <script>
         $(".delete-button").bind('click', function (a) {
             $.ajax({
                 method: "POST",

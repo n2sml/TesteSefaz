@@ -1,18 +1,12 @@
 package controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import model.Telefone;
 import model.Usuario;
@@ -57,6 +51,9 @@ public class CreateUser extends HttpServlet {
         tempUsuario.setTelefones(telefoneArrayTemp);
         
         UsuarioDAO.setNewUser(tempUsuario);
+        
+        RequestDispatcher rd = request.getRequestDispatcher("menu.jsp");
+        rd.forward(request, response);
     }
 
     @Override
