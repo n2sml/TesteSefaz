@@ -1,0 +1,60 @@
+CREATE TABLE IF NOT EXISTS usuario(
+id INT NOT NULL IDENTITY,
+nome VARCHAR(30) NOT NULL,
+email VARCHAR(60) NOT NULL,
+senha VARCHAR(30) NOT NULL,
+PRIMARY KEY(id)
+);
+
+CREATE TABLE IF NOT EXISTS telefone(
+id INT NOT NULL IDENTITY,
+usuarioId INT NOT NULL,
+ddd INT NOT NULL,
+numero VARCHAR(15) NOT NULL,
+tipo VARCHAR(15) NOT NULL,
+PRIMARY KEY(id)
+);
+
+
+INSERT INTO usuario (nome, email, senha)
+VALUES(
+'Nicolas',
+'nicolas.dasilva@live.com',
+'admin'
+);
+
+INSERT INTO telefone (usuarioId, ddd, numero, tipo)
+VALUES(
+0,
+81,
+'983374045',
+'whatsapp'
+);
+
+
+
+INSERT INTO usuario (id, nome, email, senha)
+VALUES(
+1,
+'Marina',
+'marina.bezerra@live.com',
+'marina123123'
+);
+
+INSERT INTO telefone (usuarioId, ddd, numero, tipo)
+VALUES(
+1,
+81,
+'988880000',
+'celular'
+);
+
+
+INSERT INTO telefone (usuarioId, ddd, numero, tipo)
+VALUES(
+1,
+81,
+'987654321',
+'whatsapp'
+);
+
