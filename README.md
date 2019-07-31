@@ -6,9 +6,9 @@ Meu foco neste projeto foi implementar todos os requistos obrigatórios do desaf
 
 ### Estruturar a aplicação em camadas
 Baseado no modelo MVC, desenvolvi e organizei os diretórios da seguinte forma:
-Model - (/src/main/java/model): Classes responsáveis pela modelagem dos objetos do sistema (Usuario e Telefone) e pela persistência deles (UsuarioDAO).
-View - (/src/main/webapp): Arquivos .jsp que guardam as estruturas das páginas que serão exibidas ao usuário. 
-Controller - (/src/main/java/controller): Servlets responsáveis por receber e tratar as requisições, fazer chamadas ao DAO e redirecionar o usuário ao JSP certo. Modularizado de acordo com a função no sistema (criação de usuário, edição de usuário, login, etc).
+* Model - (/src/main/java/model): Classes responsáveis pela modelagem dos objetos do sistema (Usuario e Telefone) e pela persistência deles (UsuarioDAO).
+* View - (/src/main/webapp): Arquivos .jsp que guardam as estruturas das páginas que serão exibidas ao usuário. 
+* Controller - (/src/main/java/controller): Servlets responsáveis por receber e tratar as requisições, fazer chamadas ao DAO e redirecionar o usuário ao JSP certo. Modularizado de acordo com a função no sistema (criação de usuário, edição de usuário, login, etc).
 
 ### Uso de banco de dados relacional/SQL (preferencialmente HSQLDB ou H2)
 Tomei esse requisito como um desafio. Nunca havia utilizado nenhum desses bancos, e optei por usar o HSQLDB. O banco está pronto pra uso, acompanha um arquivo com as queries usadas e instruções para rodar localmente.
