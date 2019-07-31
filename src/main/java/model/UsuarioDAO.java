@@ -352,11 +352,11 @@ public class UsuarioDAO {
                 String tempQuery = QUERY_LOGIN.replace("?1", login);
                 tempQuery = tempQuery.replace("?2", senha);
                 System.out.println("    QUERY: " + tempQuery);
-                ResultSet rs = stmt.executeQuery(tempQuery);
-                while (rs.next()) {
-                    isEmpty = true;
+                try (ResultSet rs = stmt.executeQuery(tempQuery)) {
+                    while (rs.next()) {
+                        isEmpty = true;
+                    }
                 }
-                rs.close();
             }
         } catch (SQLException e) {
             System.err.println(e.getMessage());
